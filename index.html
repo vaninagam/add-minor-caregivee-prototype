@@ -609,7 +609,7 @@
   <div class="page-wrap mid">
     <div class="page-hd">
       <h1 class="page-title">We found a match</h1>
-      <p class="page-subtitle">Please confirm this is the child you'd like to add as a caregivee</p>
+      <p class="page-subtitle">A pharmacy record was found for the information you provided</p>
     </div>
 
     <div class="search-layout">
@@ -659,14 +659,9 @@
           <div>Validation checks match shared contact details between your profile and Emma's pharmacy record. Two matching signals confirm the likely relationship.</div>
         </div>
 
-        <div class="card">
-          <div class="card-body" style="padding:16px 20px;">
-            <div style="font-size:14px; font-weight:600; color:var(--text); margin-bottom:12px;">Is this the right person?</div>
-            <div style="display:flex; gap:10px;">
-              <button class="btn btn-primary btn-lg" onclick="go(5)">Yes, this is Emma — Continue →</button>
-              <button class="btn btn-secondary" onclick="go(2)">No, search again</button>
-            </div>
-          </div>
+        <div class="card-ft" style="background:white; border:1px solid var(--border); border-radius:var(--radius-lg); justify-content:space-between; display:flex; padding:14px 20px;">
+          <button class="btn btn-ghost" onclick="go(2)">← Search again</button>
+          <button class="btn btn-primary btn-lg" onclick="go(5)">Continue to Guardian Attestation →</button>
         </div>
       </div>
 
