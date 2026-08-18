@@ -273,8 +273,9 @@
     <div class="proto-divider"></div>
     <div class="proto-step" onclick="go(4)">4 · Minor Found ✓</div>
     <div class="proto-step" onclick="go(5)">5 · Guardian Attestation</div>
-    <div class="proto-step" onclick="go(6)">6 · Confirmation</div>
-    <div class="proto-step" onclick="go(7)">7 · Family Management Updated</div>
+    <div class="proto-step" onclick="go(6)">6 · PHR Consent</div>
+    <div class="proto-step" onclick="go(7)">7 · Confirmation</div>
+    <div class="proto-step" onclick="go(8)">8 · Family Management Updated</div>
   </div>
   <span class="proto-note">TLACCAKRAK-960 / -961 · Add Minor Caregivee</span>
 </div>
@@ -690,7 +691,7 @@
 
 
 <!-- ══════════════════════════════════════════════
-     SCREEN 5 · Guardian Attestation & PHR Consent
+     SCREEN 5 · Guardian Attestation
 ══════════════════════════════════════════════ -->
 <div class="screen" id="s5">
   <div class="cvs-nav">
@@ -705,12 +706,18 @@
   </div>
   <div class="page-wrap mid">
     <div class="page-hd">
-      <h1 class="page-title">Confirm your authority</h1>
-      <p class="page-subtitle">Before adding <strong>Emma Nagam</strong>, please confirm your legal relationship and consent to accessing her pharmacy records</p>
+      <h1 class="page-title">Confirm your guardian status</h1>
+      <p class="page-subtitle">Before we continue, you must confirm that you are the legal parent or guardian of <strong>Emma Nagam</strong></p>
     </div>
 
     <div class="consent-layout">
       <div>
+        <!-- Step indicator -->
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:24px;">
+          <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--red);"><span style="width:24px; height:24px; border-radius:12px; background:var(--red); color:white; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">1</span> Guardian Attestation</div>
+          <div style="flex:1; height:2px; background:var(--border);"></div>
+          <div style="display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text-light);"><span style="width:24px; height:24px; border-radius:12px; background:var(--border); color:var(--text-light); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">2</span> PHR Consent</div>
+        </div>
 
         <!-- Minor info summary -->
         <div style="display:flex; align-items:center; gap:14px; padding:16px 18px; background:var(--green-light); border:1px solid var(--green-mid); border-radius:var(--radius-lg); margin-bottom:20px;">
@@ -722,16 +729,113 @@
           <div style="margin-left:auto;"><span class="val-badge val-match" style="font-size:12px;">✓ Validated</span></div>
         </div>
 
-        <!-- PHR Consent language -->
+        <!-- Mandatory guardian checkbox -->
+        <div class="card" style="margin-bottom:18px; border:2px solid var(--red);">
+          <div class="card-hd" style="background:var(--red-light);">
+            <div class="card-hd-title" style="color:var(--red);">⚠️ Required: Guardian Confirmation</div>
+            <div class="card-hd-sub">You must confirm your legal relationship before proceeding to PHR consent</div>
+          </div>
+          <div class="card-body">
+            <div class="checkbox-item checked" id="guardian-checkbox" onclick="toggleGuardian()">
+              <div class="checkbox-box checked" id="guardian-box">
+                <span class="checkbox-check">✓</span>
+              </div>
+              <div class="checkbox-label">
+                I confirm that I am the <strong>legal parent or guardian</strong> of <strong>Emma Nagam</strong> and that I have the legal authority to access, view, and manage her pharmacy and health records on CVS Health. I understand that providing false information is a violation of CVS Health's Terms of Use and may be unlawful.
+              </div>
+            </div>
+          </div>
+          <div class="card-ft" style="justify-content:space-between; background:var(--red-light);">
+            <button class="btn btn-ghost" onclick="go(4)">← Back</button>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <button class="btn btn-secondary" onclick="go(1)">Cancel</button>
+              <button class="btn btn-primary btn-lg" onclick="go(6)">
+                Continue to PHR Consent →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-warning">
+          <span class="alert-icon">⚠️</span>
+          <div style="font-size:13px;">If you do not confirm your guardian status, Emma will not be added and no caregiving relationship will be created.</div>
+        </div>
+      </div>
+
+      <!-- Right panel -->
+      <div class="sticky-panel">
+        <div class="help-card" style="margin-bottom:16px;">
+          <div class="help-card-icon">🔒</div>
+          <div class="help-card-title">Why we require this</div>
+          <div class="help-card-text">Federal law (HIPAA) and CVS Health policy require explicit guardian confirmation before granting access to a minor's pharmacy and health records.</div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><div class="card-hd-title">Two steps to add Emma</div></div>
+          <div class="timeline" style="padding:4px 16px 8px;">
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background:var(--red); color:white;">1</div>
+              <div><div class="timeline-title" style="color:var(--red);">Guardian Attestation</div><div class="timeline-desc">Confirm you are Emma's legal parent or guardian</div></div>
+            </div>
+            <div class="timeline-item" style="border:none;">
+              <div class="timeline-dot">2</div>
+              <div><div class="timeline-title">PHR Consent</div><div class="timeline-desc">Review and accept access to Emma's health records</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 6 · PHR Consent
+══════════════════════════════════════════════ -->
+<div class="screen" id="s6">
+  <div class="cvs-nav">
+    <div class="cvs-logo"><span class="cvs-logo-heart">❤️</span><span class="cvs-logo-text">CVS</span><span class="cvs-logo-tagline">Health</span></div>
+    <div class="cvs-nav-links"><div class="cvs-nav-link">Pharmacy</div><div class="cvs-nav-link">MinuteClinic</div><div class="cvs-nav-link active">My Account</div><div class="cvs-nav-link">Health</div></div>
+    <div class="cvs-nav-right"><div class="cvs-nav-user"><div class="cvs-nav-avatar">VN</div><span>Hi, Vani</span></div></div>
+  </div>
+  <div class="sub-nav">
+    <a onclick="go(1)">Family Management</a><span class="sub-nav-sep">›</span>
+    <a onclick="go(2)">Add a Child</a><span class="sub-nav-sep">›</span>
+    <span>PHR Consent</span>
+  </div>
+  <div class="page-wrap mid">
+    <div class="page-hd">
+      <h1 class="page-title">Authorize access to health records</h1>
+      <p class="page-subtitle">Review the Personal Health Record access you are granting for <strong>Emma Nagam</strong></p>
+    </div>
+
+    <div class="consent-layout">
+      <div>
+        <!-- Step indicator -->
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:24px;">
+          <div style="display:flex; align-items:center; gap:6px; font-size:13px; color:var(--green); font-weight:600;"><span style="width:24px; height:24px; border-radius:12px; background:var(--green); color:white; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">✓</span> Guardian Attestation</div>
+          <div style="flex:1; height:2px; background:var(--red);"></div>
+          <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--red);"><span style="width:24px; height:24px; border-radius:12px; background:var(--red); color:white; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">2</span> PHR Consent</div>
+        </div>
+
+        <!-- Minor info summary -->
+        <div style="display:flex; align-items:center; gap:14px; padding:16px 18px; background:var(--green-light); border:1px solid var(--green-mid); border-radius:var(--radius-lg); margin-bottom:20px;">
+          <div style="width:44px; height:44px; border-radius:22px; background:linear-gradient(135deg,var(--green),#00CC66); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:white; flex-shrink:0;">EN</div>
+          <div>
+            <div style="font-size:15px; font-weight:700; color:var(--text);">Emma Nagam</div>
+            <div style="font-size:13px; color:var(--text-mid);">Date of Birth: June 14, 2015 · Age 10 · CVS Pharmacy #2847</div>
+          </div>
+          <div style="margin-left:auto;"><span class="val-badge val-match" style="font-size:12px;">✓ Guardian Confirmed</span></div>
+        </div>
+
+        <!-- PHR Authorization text -->
         <div class="card" style="margin-bottom:18px;">
           <div class="card-hd">
-            <div class="card-hd-title">Authorization to Access Minor's Health Records</div>
-            <div class="card-hd-sub">Please read the following carefully before confirming</div>
+            <div class="card-hd-title">Personal Health Record (PHR) Access Authorization</div>
+            <div class="card-hd-sub">Please read carefully before accepting</div>
           </div>
           <div class="card-body">
             <div class="phr-text-box">
-              <p><strong>Personal Health Record (PHR) Access Authorization</strong></p>
-              <p>By confirming guardian status below, you authorize CVS Health to link <strong>Emma Nagam's</strong> pharmacy records to your account and grant you the ability to view and manage her health information, including:</p>
+              <p>By accepting below, you authorize CVS Health to link <strong>Emma Nagam's</strong> pharmacy and health records to your account and grant you the ability to view and manage her health information, including:</p>
               <p>
                 <strong>CVS Pharmacy®</strong> — prescription history, refill status, and pickup information<br/>
                 <strong>CVS Caremark®</strong> — mail order prescription details and delivery tracking<br/>
@@ -747,9 +851,9 @@
               <p>This authorization does not transfer any rights or responsibilities associated with the minor's health insurance or benefits coverage.</p>
             </div>
 
-            <!-- What you'll be able to do -->
+            <!-- Access being granted -->
             <div style="margin-bottom:18px;">
-              <div style="font-size:13px; font-weight:600; color:var(--text-mid); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.4px; font-size:11px;">Access being granted</div>
+              <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-light); margin-bottom:10px;">Access being granted</div>
               <div style="display:flex; flex-direction:column; gap:0; border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden;">
                 <div class="consent-summary-row" style="padding:12px 14px;">
                   <span class="consent-summary-icon">💊</span>
@@ -765,26 +869,9 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Mandatory guardian checkbox -->
-        <div class="card" style="margin-bottom:18px; border:2px solid var(--red);">
-          <div class="card-hd" style="background:var(--red-light);">
-            <div class="card-hd-title" style="color:var(--red);">⚠️ Required: Guardian Confirmation</div>
-            <div class="card-hd-sub">This checkbox is mandatory. You cannot proceed without confirming your guardian status.</div>
-          </div>
-          <div class="card-body">
-            <div class="checkbox-item checked" id="guardian-checkbox" onclick="toggleGuardian()">
-              <div class="checkbox-box checked" id="guardian-box">
-                <span class="checkbox-check">✓</span>
-              </div>
-              <div class="checkbox-label">
-                I confirm that I am the <strong>legal parent or guardian</strong> of <strong>Emma Nagam</strong> and that I have the legal authority to access, view, and manage her pharmacy and health records on CVS Health. I understand that providing false information is a violation of CVS Health's Terms of Use and may be unlawful.
-              </div>
-            </div>
-
-            <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
+            <!-- Consent checkboxes -->
+            <div style="padding-top:4px;">
               <div class="secondary-checkbox" onclick="toggleSecondary('sc1')">
                 <div class="secondary-checkbox-box checked" id="sc1-box"><span class="secondary-checkbox-check">✓</span></div>
                 <div class="secondary-checkbox-label">I have read and understand the PHR Access Authorization above</div>
@@ -795,31 +882,25 @@
               </div>
             </div>
           </div>
-          <div class="card-ft" style="justify-content:space-between; background:var(--red-light);">
-            <button class="btn btn-ghost" onclick="go(4)">← Back</button>
+          <div class="card-ft" style="justify-content:space-between;">
+            <button class="btn btn-ghost" onclick="go(5)">← Back</button>
             <div style="display:flex; gap:10px; align-items:center;">
               <button class="btn btn-secondary" onclick="go(1)">Cancel</button>
-              <button class="btn btn-primary btn-lg" id="submit-btn" onclick="go(6)">
-                Submit &amp; Add Emma →
+              <button class="btn btn-primary btn-lg" onclick="go(7)">
+                Accept &amp; Add Emma →
               </button>
             </div>
           </div>
-        </div>
-
-        <div class="alert alert-warning">
-          <span class="alert-icon">⚠️</span>
-          <div style="font-size:13px;">If you do not confirm your guardian status, Emma will not be added and no caregiving relationship will be created. There are no partial or pending entries — the process must be completed in full.</div>
         </div>
       </div>
 
       <!-- Right panel -->
       <div class="sticky-panel">
         <div class="help-card" style="margin-bottom:16px;">
-          <div class="help-card-icon">🔒</div>
-          <div class="help-card-title">Why we require this</div>
-          <div class="help-card-text">Federal law (HIPAA) and CVS Health policy require explicit guardian confirmation before granting access to a minor's pharmacy and health records.</div>
+          <div class="help-card-icon">📋</div>
+          <div class="help-card-title">About PHR consent</div>
+          <div class="help-card-text">PHR consent gives you permission to view and act on Emma's pharmacy records across all CVS lines of business.</div>
         </div>
-
         <div class="card">
           <div class="card-hd"><div class="card-hd-title">What happens next</div></div>
           <div class="timeline" style="padding:4px 16px 8px;">
@@ -833,7 +914,7 @@
             </div>
             <div class="timeline-item" style="border:none;">
               <div class="timeline-dot">3</div>
-              <div><div class="timeline-title">Consent stored</div><div class="timeline-desc">Your attestation is recorded. No re-attestation needed unless the relationship is revoked.</div></div>
+              <div><div class="timeline-title">Consent stored</div><div class="timeline-desc">No re-attestation needed unless the relationship is revoked</div></div>
             </div>
           </div>
         </div>
@@ -844,9 +925,9 @@
 
 
 <!-- ══════════════════════════════════════════════
-     SCREEN 6 · Success Confirmation
+     SCREEN 7 · Success Confirmation
 ══════════════════════════════════════════════ -->
-<div class="screen" id="s6">
+<div class="screen" id="s7">
   <div class="cvs-nav">
     <div class="cvs-logo"><span class="cvs-logo-heart">❤️</span><span class="cvs-logo-text">CVS</span><span class="cvs-logo-tagline">Health</span></div>
     <div class="cvs-nav-links"><div class="cvs-nav-link">Pharmacy</div><div class="cvs-nav-link">MinuteClinic</div><div class="cvs-nav-link active">My Account</div><div class="cvs-nav-link">Health</div></div>
@@ -890,8 +971,8 @@
 
         <!-- Next actions -->
         <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
-          <button class="btn btn-primary btn-lg" onclick="go(7)">💊 Manage Emma's Rx →</button>
-          <button class="btn btn-secondary btn-lg" onclick="go(7)">← Back to Family Management</button>
+          <button class="btn btn-primary btn-lg" onclick="go(8)">💊 Manage Emma's Rx →</button>
+          <button class="btn btn-secondary btn-lg" onclick="go(8)">← Back to Family Management</button>
         </div>
       </div>
     </div>
@@ -900,9 +981,9 @@
 
 
 <!-- ══════════════════════════════════════════════
-     SCREEN 7 · Family Management — Updated
+     SCREEN 8 · Family Management — Updated
 ══════════════════════════════════════════════ -->
-<div class="screen" id="s7">
+<div class="screen" id="s8">
   <div class="cvs-nav">
     <div class="cvs-logo"><span class="cvs-logo-heart">❤️</span><span class="cvs-logo-text">CVS</span><span class="cvs-logo-tagline">Health</span></div>
     <div class="cvs-nav-links"><div class="cvs-nav-link">Pharmacy</div><div class="cvs-nav-link">MinuteClinic</div><div class="cvs-nav-link active">My Account</div><div class="cvs-nav-link">Health</div></div>
@@ -1013,7 +1094,7 @@
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('s' + n).classList.add('active');
     // map screen numbers to toolbar pill indices
-    const map = {1:0, 2:1, 3:3, 4:5, 5:6, 6:7, 7:8};
+    const map = {1:0, 2:1, 3:3, 4:5, 5:6, 6:7, 7:8, 8:9};
     document.querySelectorAll('.proto-step').forEach((s, i) => {
       s.classList.toggle('active', i === (map[n] !== undefined ? map[n] : n - 1));
     });
