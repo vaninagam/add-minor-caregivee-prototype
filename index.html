@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1280" />
+<title>CVS Health — Add a Minor Caregivee · Prototype</title>
+<style>
+  :root {
+    --red: #CC0000;
+    --red-dark: #A30000;
+    --red-light: #FFF5F5;
+    --red-mid: #FFE0E0;
+    --text: #1A1A1A;
+    --text-mid: #555;
+    --text-light: #888;
+    --border: #E8E8E8;
+    --bg: #F5F6F8;
+    --white: #FFFFFF;
+    --green: #00875A;
+    --green-light: #E6F7F0;
+    --green-mid: #B3E6D0;
+    --blue: #0050CC;
+    --blue-light: #EEF3FF;
+    --blue-mid: #C0D0F0;
+    --yellow: #FFF9EE;
+    --yellow-mid: #F5DFA0;
+    --yellow-dark: #B07800;
+    --orange: #FF6B00;
+    --orange-light: #FFF3EB;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── Prototype toolbar ── */
+  .proto-bar { background: #1A1A2E; padding: 0 24px; height: 44px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 999; }
+  .proto-label { font-size: 12px; font-weight: 600; color: #AAB; letter-spacing: 0.3px; flex-shrink: 0; }
+  .proto-steps { display: flex; gap: 6px; margin-left: 8px; flex: 1; overflow-x: auto; }
+  .proto-step { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; color: #778; border: 1px solid #334; transition: all 0.15s; }
+  .proto-step:hover { color: #AAB; border-color: #556; }
+  .proto-step.active { background: var(--red); color: white; border-color: var(--red); }
+  .proto-step.alt { border-color: #7A5C00; color: #C8A830; }
+  .proto-step.alt.active { background: #7A5C00; border-color: #7A5C00; color: white; }
+  .proto-divider { width: 1px; height: 20px; background: #334; margin: 0 4px; flex-shrink: 0; }
+  .proto-note { font-size: 11px; color: #556; margin-left: auto; flex-shrink: 0; }
+
+  /* ── Screen ── */
+  .screen { display: none; flex-direction: column; min-height: calc(100vh - 44px); }
+  .screen.active { display: flex; }
+
+  /* ── CVS Nav ── */
+  .cvs-nav { background: var(--red); height: 56px; display: flex; align-items: center; padding: 0 32px; gap: 24px; flex-shrink: 0; }
+  .cvs-logo { display: flex; align-items: center; gap: 8px; }
+  .cvs-logo-heart { font-size: 22px; }
+  .cvs-logo-text { color: white; font-size: 20px; font-weight: 800; letter-spacing: 1px; }
+  .cvs-logo-tagline { color: rgba(255,255,255,0.7); font-size: 11px; border-left: 1px solid rgba(255,255,255,0.3); padding-left: 10px; }
+  .cvs-nav-links { display: flex; gap: 2px; margin-left: 16px; }
+  .cvs-nav-link { color: rgba(255,255,255,0.85); font-size: 13px; padding: 6px 12px; border-radius: var(--radius-sm); cursor: pointer; transition: background 0.15s; }
+  .cvs-nav-link:hover { background: rgba(255,255,255,0.15); }
+  .cvs-nav-link.active { background: rgba(255,255,255,0.2); color: white; font-weight: 600; }
+  .cvs-nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .cvs-nav-user { display: flex; align-items: center; gap: 8px; color: white; font-size: 13px; cursor: pointer; }
+  .cvs-nav-avatar { width: 32px; height: 32px; border-radius: 16px; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; }
+
+  /* ── Sub-nav ── */
+  .sub-nav { background: white; border-bottom: 1px solid var(--border); padding: 0 32px; height: 44px; display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-light); flex-shrink: 0; }
+  .sub-nav a { color: var(--red); cursor: pointer; }
+  .sub-nav a:hover { text-decoration: underline; }
+  .sub-nav span { color: var(--text-mid); font-weight: 500; }
+  .sub-nav-sep { color: #CCC; }
+
+  /* ── Page ── */
+  .page-wrap { max-width: 1100px; margin: 0 auto; padding: 36px 32px 64px; flex: 1; }
+  .page-wrap.narrow { max-width: 700px; }
+  .page-wrap.mid { max-width: 860px; }
+  .page-hd { margin-bottom: 28px; }
+  .page-title { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.4px; }
+  .page-subtitle { font-size: 15px; color: var(--text-mid); margin-top: 6px; line-height: 1.5; }
+
+  /* ── Cards ── */
+  .card { background: white; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); overflow: hidden; }
+  .card-hd { padding: 18px 22px; border-bottom: 1px solid var(--border); }
+  .card-hd-title { font-size: 16px; font-weight: 700; color: var(--text); }
+  .card-hd-sub { font-size: 13px; color: var(--text-light); margin-top: 3px; }
+  .card-body { padding: 22px; }
+  .card-ft { padding: 14px 22px; border-top: 1px solid var(--border); background: #FAFAFA; display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+
+  /* ── Buttons ── */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 10px 20px; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; white-space: nowrap; }
+  .btn-primary { background: var(--red); color: white; }
+  .btn-primary:hover { background: var(--red-dark); }
+  .btn-secondary { background: white; color: var(--text); border: 1.5px solid var(--border); }
+  .btn-secondary:hover { border-color: #BBB; background: var(--bg); }
+  .btn-ghost { background: transparent; color: var(--text-mid); }
+  .btn-ghost:hover { color: var(--text); background: var(--bg); }
+  .btn-blue { background: var(--blue); color: white; }
+  .btn-blue:hover { background: #003EA8; }
+  .btn-green { background: var(--green); color: white; }
+  .btn-green:hover { background: #006B47; }
+  .btn-lg { padding: 14px 28px; font-size: 15px; }
+  .btn-sm { padding: 7px 14px; font-size: 13px; }
+  .btn-disabled { background: #DDD; color: #999; cursor: not-allowed; }
+
+  /* ── Forms ── */
+  .form-group { margin-bottom: 18px; }
+  .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--text-mid); margin-bottom: 6px; }
+  .form-label .req { color: var(--red); margin-left: 2px; }
+  .form-input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-md); font-size: 15px; color: var(--text); background: white; outline: none; transition: border-color 0.15s; }
+  .form-input:focus, .form-input.active { border-color: var(--red); }
+  .form-input.filled { border-color: var(--border); }
+  .form-hint { font-size: 12px; color: var(--text-light); margin-top: 5px; line-height: 1.5; }
+  .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 12px; }
+  .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .select-input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-md); font-size: 15px; color: var(--text); background: white; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; cursor: pointer; }
+
+  /* ── Alert ── */
+  .alert { display: flex; gap: 10px; padding: 13px 16px; border-radius: var(--radius-md); margin-bottom: 18px; font-size: 14px; line-height: 1.6; }
+  .alert-icon { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
+  .alert-info { background: var(--blue-light); border: 1px solid var(--blue-mid); color: #003A99; }
+  .alert-warning { background: var(--yellow); border: 1px solid var(--yellow-mid); color: var(--yellow-dark); }
+  .alert-error { background: var(--red-light); border: 1px solid var(--red-mid); color: var(--red-dark); }
+  .alert-success { background: var(--green-light); border: 1px solid var(--green-mid); color: var(--green); }
+
+  /* ── Add people grid (Screen 1) ── */
+  .fam-layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
+  .section-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-light); margin-bottom: 10px; }
+  .fam-section { margin-bottom: 24px; }
+
+  .add-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .add-tile { background: white; border: 1.5px dashed var(--border); border-radius: var(--radius-lg); padding: 20px 16px; cursor: pointer; transition: all 0.15s; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .add-tile:hover { border-color: var(--red); background: var(--red-light); }
+  .add-tile.highlight { border-color: var(--red); background: var(--red-light); }
+  .add-tile-icon { font-size: 28px; }
+  .add-tile-label { font-size: 14px; font-weight: 600; color: var(--text); }
+  .add-tile-desc { font-size: 12px; color: var(--text-light); }
+
+  .member-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-md); background: white; margin-bottom: 10px; box-shadow: var(--shadow-sm); }
+  .member-avatar { width: 44px; height: 44px; border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: white; flex-shrink: 0; }
+  .av-blue { background: linear-gradient(135deg, #2A5FA0, #4488FF); }
+  .av-green { background: linear-gradient(135deg, #00875A, #00CC66); }
+  .av-purple { background: linear-gradient(135deg, #7B3FC4, #AA66FF); }
+  .member-info { flex: 1; }
+  .member-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .member-meta { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+  .member-badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+  .badge-caregiver { background: var(--blue-light); color: var(--blue); }
+  .badge-minor { background: var(--green-light); color: var(--green); }
+
+  /* ── Search form layout ── */
+  .search-layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
+  .sticky-panel { position: sticky; top: 60px; }
+  .help-card { background: var(--red-light); border: 1px solid var(--red-mid); border-radius: var(--radius-lg); padding: 20px; }
+  .help-card-icon { font-size: 28px; margin-bottom: 10px; }
+  .help-card-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .help-card-text { font-size: 13px; color: var(--text-mid); line-height: 1.6; }
+  .help-list { list-style: none; margin-top: 10px; }
+  .help-list li { font-size: 13px; color: var(--text-mid); padding: 4px 0; display: flex; align-items: flex-start; gap: 7px; }
+  .help-list li::before { content: '✓'; color: var(--red); font-weight: 700; font-size: 12px; flex-shrink: 0; margin-top: 2px; }
+
+  /* ── Connect another way ── */
+  .alt-connect { border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; margin-top: 4px; }
+  .alt-connect-hd { padding: 12px 16px; background: var(--bg); border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 600; color: var(--text-mid); }
+  .alt-connect-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; transition: background 0.15s; border-bottom: 1px solid var(--border); }
+  .alt-connect-item:last-child { border-bottom: none; }
+  .alt-connect-item:hover { background: var(--bg); }
+  .alt-connect-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .alt-connect-text { flex: 1; }
+  .alt-connect-title { font-size: 14px; font-weight: 500; color: var(--text); }
+  .alt-connect-desc { font-size: 12px; color: var(--text-light); margin-top: 1px; }
+  .alt-connect-arrow { color: #CCC; font-size: 16px; }
+
+  /* ── Match found card ── */
+  .match-card { border: 2px solid var(--green); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px; }
+  .match-card-hd { background: var(--green); padding: 14px 20px; display: flex; align-items: center; gap: 10px; }
+  .match-card-hd-text { color: white; font-size: 15px; font-weight: 700; }
+  .match-card-body { padding: 20px; background: white; }
+  .match-profile { display: flex; align-items: center; gap: 16px; }
+  .match-avatar { width: 56px; height: 56px; border-radius: 28px; background: linear-gradient(135deg, var(--green), #00CC66); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: white; flex-shrink: 0; }
+  .match-name { font-size: 18px; font-weight: 700; color: var(--text); }
+  .match-detail { font-size: 13px; color: var(--text-light); margin-top: 3px; }
+  .match-fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+  .match-field { background: var(--bg); border-radius: var(--radius-md); padding: 10px 14px; }
+  .match-field-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-light); margin-bottom: 4px; }
+  .match-field-val { font-size: 14px; font-weight: 600; color: var(--text); }
+
+  /* ── Validation badge ── */
+  .validation-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .val-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .val-match { background: var(--green-light); color: var(--green); border: 1px solid var(--green-mid); }
+  .val-uncheck { background: var(--bg); color: var(--text-light); border: 1px solid var(--border); }
+
+  /* ── Attestation / Consent ── */
+  .consent-layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
+
+  .consent-box { background: white; border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px; }
+  .consent-box.required { border-color: var(--red); }
+
+  .phr-text-box { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 18px; font-size: 13px; color: var(--text-mid); line-height: 1.8; max-height: 220px; overflow-y: auto; margin-bottom: 16px; }
+  .phr-text-box p { margin-bottom: 10px; }
+  .phr-text-box p:last-child { margin-bottom: 0; }
+  .phr-text-box strong { color: var(--text); }
+
+  .checkbox-item { display: flex; align-items: flex-start; gap: 12px; padding: 16px; background: var(--red-light); border: 1.5px solid var(--red-mid); border-radius: var(--radius-md); cursor: pointer; transition: all 0.15s; }
+  .checkbox-item.checked { background: #FFF0F0; border-color: var(--red); }
+  .checkbox-box { width: 22px; height: 22px; border-radius: 5px; border: 2px solid var(--red); background: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: all 0.15s; }
+  .checkbox-box.checked { background: var(--red); border-color: var(--red); }
+  .checkbox-check { color: white; font-size: 14px; font-weight: 700; display: none; }
+  .checkbox-box.checked .checkbox-check { display: block; }
+  .checkbox-label { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.6; }
+  .checkbox-label strong { color: var(--red); }
+
+  .secondary-checkbox { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; cursor: pointer; }
+  .secondary-checkbox-box { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--border); background: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .secondary-checkbox-box.checked { background: var(--red); border-color: var(--red); }
+  .secondary-checkbox-check { color: white; font-size: 11px; font-weight: 700; display: none; }
+  .secondary-checkbox-box.checked .secondary-checkbox-check { display: block; }
+  .secondary-checkbox-label { font-size: 13px; color: var(--text-mid); line-height: 1.6; }
+
+  .consent-summary-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .consent-summary-row:last-child { border-bottom: none; }
+  .consent-summary-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .consent-summary-text { flex: 1; color: var(--text-mid); }
+  .consent-summary-text strong { color: var(--text); }
+
+  /* ── Timeline / steps ── */
+  .timeline { display: flex; flex-direction: column; }
+  .timeline-item { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .timeline-item:last-child { border-bottom: none; }
+  .timeline-dot { width: 28px; height: 28px; border-radius: 14px; background: var(--red-light); color: var(--red); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .timeline-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .timeline-desc { font-size: 13px; color: var(--text-light); margin-top: 2px; line-height: 1.5; }
+
+  /* ── Success ── */
+  .success-hero { text-align: center; padding: 40px 24px 32px; }
+  .success-circle { width: 96px; height: 96px; border-radius: 48px; background: linear-gradient(135deg, var(--green), #00CC66); display: flex; align-items: center; justify-content: center; font-size: 44px; margin: 0 auto 20px; box-shadow: 0 8px 24px rgba(0,135,90,0.25); }
+  .success-title { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.4px; margin-bottom: 10px; }
+  .success-sub { font-size: 15px; color: var(--text-mid); line-height: 1.7; max-width: 440px; margin: 0 auto; }
+
+  /* ── Minor profile card (Screen 7) ── */
+  .minor-profile-card { display: flex; align-items: center; gap: 16px; padding: 18px 20px; background: white; border: 2px solid var(--green); border-radius: var(--radius-lg); margin-bottom: 16px; box-shadow: var(--shadow-sm); }
+  .minor-profile-avatar { width: 52px; height: 52px; border-radius: 26px; background: linear-gradient(135deg, var(--green), #00CC66); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: white; flex-shrink: 0; }
+  .minor-profile-info { flex: 1; }
+  .minor-profile-name { font-size: 16px; font-weight: 700; color: var(--text); }
+  .minor-profile-meta { font-size: 13px; color: var(--text-light); margin-top: 3px; }
+  .minor-profile-new { font-size: 11px; font-weight: 700; background: var(--green); color: white; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
+
+  /* ── Misc ── */
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+  .text-link { color: var(--red); cursor: pointer; font-size: 13px; text-decoration: underline; }
+  .text-link:hover { color: var(--red-dark); }
+  .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 4px; margin-right: 5px; }
+  .dot-green { background: var(--green); }
+  .dot-yellow { background: var(--yellow-dark); }
+  .dot-red { background: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- Prototype toolbar -->
+<div class="proto-bar">
+  <span class="proto-label">PROTOTYPE</span>
+  <div class="proto-steps">
+    <div class="proto-step active" onclick="go(1)">1 · Family Management</div>
+    <div class="proto-step" onclick="go(2)">2 · Who are you caring for?</div>
+    <div class="proto-divider"></div>
+    <div class="proto-step alt" onclick="go(3)">3 · Alt: Rx Label Lookup</div>
+    <div class="proto-divider"></div>
+    <div class="proto-step" onclick="go(4)">4 · Minor Found ✓</div>
+    <div class="proto-step" onclick="go(5)">5 · Guardian Attestation</div>
+    <div class="proto-step" onclick="go(6)">6 · Confirmation</div>
+    <div class="proto-step" onclick="go(7)">7 · Family Management Updated</div>
+  </div>
+  <span class="proto-note">TLACCAKRAK-960 / -961 · Add Minor Caregivee</span>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 1 · Family Management Landing
+══════════════════════════════════════════════ -->
+<div class="screen active" id="s1">
+  <div class="cvs-nav">
+    <div class="cvs-logo"><span class="cvs-logo-heart">❤️</span><span class="cvs-logo-text">CVS</span><span class="cvs-logo-tagline">Health</span></div>
+    <div class="cvs-nav-links">
+      <div class="cvs-nav-link">Pharmacy</div>
+      <div class="cvs-nav-link">MinuteClinic</div>
+      <div class="cvs-nav-link active">My Account</div>
+      <div class="cvs-nav-link">Health</div>
+    </div>
+    <div class="cvs-nav-right"><div class="cvs-nav-user"><div class="cvs-nav-avatar">VN</div><span>Hi, Vani</span></div></div>
+  </div>
+  <div class="sub-nav"><a>My Account</a><span class="sub-nav-sep">›</span><span>Family Management</span></div>
+  <div class="page-wrap">
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:28px;">
+      <div>
+        <h1 class="page-title">Add and manage people</h1>
+        <p class="page-subtitle">Manage caregiving relationships and access to pharmacy records</p>
+      </div>
+    </div>
+
+    <div class="fam-layout">
+      <div>
+        <!-- Who you're caring for -->
+        <div class="fam-section">
+          <div class="section-label">Who you're caring for</div>
+          <div class="member-card">
+            <div class="member-avatar av-blue">MJ</div>
+            <div class="member-info">
+              <div class="member-name">Maria Johnson <span class="member-badge badge-caregiver" style="margin-left:6px;">Caregiver</span></div>
+              <div class="member-meta">Spouse · Active since Jan 2026</div>
+            </div>
+            <button class="btn btn-secondary btn-sm">Manage Maria</button>
+          </div>
+        </div>
+
+        <!-- Add people and pets -->
+        <div class="fam-section">
+          <div class="section-label">Add people and pets</div>
+          <div class="add-grid">
+            <div class="add-tile highlight" onclick="go(2)">
+              <div class="add-tile-icon">👧</div>
+              <div class="add-tile-label">Add a child</div>
+              <div class="add-tile-desc">Under 18 years old</div>
+            </div>
+            <div class="add-tile">
+              <div class="add-tile-icon">🧑</div>
+              <div class="add-tile-label">Add an adult</div>
+              <div class="add-tile-desc">18 years or older</div>
+            </div>
+            <div class="add-tile">
+              <div class="add-tile-icon">🐾</div>
+              <div class="add-tile-label">Add a pet</div>
+              <div class="add-tile-desc">Manage pet prescriptions</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Caregivers for you -->
+        <div class="fam-section">
+          <div class="section-label">People who care for you</div>
+          <div class="member-card">
+            <div class="member-avatar av-purple">RN</div>
+            <div class="member-info">
+              <div class="member-name">Raj Nagam <span class="member-badge badge-caregiver" style="margin-left:6px;">Caregiver</span></div>
+              <div class="member-meta">Spouse · Active since Mar 2025</div>
+            </div>
+            <button class="btn btn-secondary btn-sm">Manage</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Side panel -->
+      <div>
+        <div class="card">
+          <div class="card-hd"><div class="card-hd-title">About Family Management</div></div>
+          <div class="card-body" style="font-size:13px; color:var(--text-mid); line-height:1.7;">
+            <p style="margin-bottom:12px;">Manage who can view and take action on prescriptions across:</p>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; gap:8px; align-items:center;"><span style="font-size:16px;">💊</span><span>CVS Pharmacy®</span></div>
+              <div style="display:flex; gap:8px; align-items:center;"><span style="font-size:16px;">📦</span><span>CVS Caremark®</span></div>
+              <div style="display:flex; gap:8px; align-items:center;"><span style="font-size:16px;">🔬</span><span>CVS Specialty®</span></div>
+            </div>
+            <div class="divider"></div>
+            <p style="font-size:12px; color:var(--text-light);">Adding a child requires verification that you are their legal guardian or parent.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 2 · Who are you caring for?
+══════════════════════════════════════════════ -->
+<div class="screen" id="s2">
+  <div class="cvs-nav">
+    <div class="cvs-logo"><span class="cvs-logo-heart">❤️</span><span class="cvs-logo-text">CVS</span><span class="cvs-logo-tagline">Health</span></div>
+    <div class="cvs-nav-links"><div class="cvs-nav-link">Pharmacy</div><div class="cvs-nav-link">MinuteClinic</div><div class="cvs-nav-link active">My Account</div><div class="cvs-nav-link">Health</div></div>
+    <div class="cvs-nav-right"><div class="cvs-nav-user"><div class="cvs-nav-avatar">VN</div><span>Hi, Vani</span></div></div>
+  </div>
+  <div class="sub-nav">
+    <a onclick="go(1)">Family Management</a><span class="sub-nav-sep">›</span><span>Add a Child</span>
+  </div>
+  <div class="page-wrap mid">
+    <div class="page-hd">
+      <h1 class="page-title">Who are you caring for?</h1>
+      <p class="page-subtitle">Enter your child's information to find their pharmacy records</p>
+    </div>
+
+    <div class="search-layout">
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-hd">
+            <div class="card-hd-title">Child's Information</div>
+            <div class="card-hd-sub">All fields are required. The phone number must match the one on file at the pharmacy.</div>
+          </div>
+          <div class="card-body">
+            <div class="form-row-2" style="margin-bottom:18px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">First Name <span class="req">*</span></label>
+                <input class="form-input active" type="text" value="Emma" readonly />
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Last Name <span class="req">*</span></label>
+                <input class="form-input filled" type="text" value="Nagam" readonly />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Date of Birth <span class="req">*</span></label>
+              <div class="form-row-3">
+                <div>
+                  <select class="select-input"><option selected>June</option></select>
+                </div>
+                <div>
+                  <select class="select-input"><option selected>14</option></select>
+                </div>
+                <div>
+                  <input class="form-input filled" type="text" value="2015" readonly />
+                </div>
+              </div>
+              <div class="form-hint">4-digit year required (e.g. 2015)</div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Phone Number <span class="req">*</span></label>
+              <input class="form-input filled" type="tel" value="(401) 555-0192" readonly />
+              <div class="form-hint">Must match the phone number on file with the pharmacy</div>
+            </div>
+          </div>
+          <div class="card-ft" style="justify-content:space-between;">
+            <button class="btn btn-ghost" onclick="go(1)">← Cancel</button>
+            <button class="btn btn-primary btn-lg" onclick="go(4)">🔍 Search</button>
+          </div>
+        </div>
+
+        <!-- Connect another way -->
+        <div>
+          <div style="font-size:13px; color:var(--text-light); margin-bottom:10px; text-align:center;">Can't find them with these details?</div>
+          <div class="alt-connect">
+            <div class="alt-connect-hd">Connect another way</div>
+            <div class="alt-connect-item" onclick="go(3)">
+              <div class="alt-connect-icon">🏷️</div>
+              <div class="alt-connect-text">
+                <div class="alt-connect-title">Use a prescription label</div>
+                <div class="alt-connect-desc">Look up using Rx number or barcode from a prescription bottle</div>
+              </div>
+              <div class="alt-connect-arrow">›</div>
+            </div>
+            <div class="alt-connect-item">
+              <div class="alt-connect-icon">🏠</div>
+              <div class="alt-connect-text">
+                <div class="alt-connect-title">Add home address</div>
+                <div class="alt-connect-desc">Provide the address on file to improve search accuracy</div>
+              </div>
+              <div class="alt-connect-arrow">›</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right panel -->
+      <div class="sticky-panel">
+        <div class="help-card" style="margin-bottom:16px;">
+          <div class="help-card-icon">🔍</div>
+          <div class="help-card-title">How the search works</div>
+          <div class="help-card-text">We'll look up your child's existing pharmacy records using the information you provide.</div>
+          <ul class="help-list">
+            <li>Records searched across CVS Pharmacy, Caremark &amp; Specialty</li>
+            <li>Phone number must match pharmacy records</li>
+            <li>DOB must be exact — 4-digit year required</li>
+            <li>Name must match as registered at the pharmacy</li>
+          </ul>
+        </div>
+        <div class="alert alert-info" style="margin-bottom:0;">
+          <span class="alert-icon">🔒</span>
+          <div style="font-size:13px;">Your child's information is encrypted and only used to verify their pharmacy records.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 3 · Alternative: Rx Label Lookup
+══════════════════════════════════════════════ -->
+<div class="screen" id="s3">
+  <div class="cvs-nav">
+    <div class="cvs-logo"><span class="cvs-logo-heart">❤️</span><span class="cvs-logo-text">CVS</span><span class="cvs-logo-tagline">Health</span></div>
+    <div class="cvs-nav-links"><div class="cvs-nav-link">Pharmacy</div><div class="cvs-nav-link">MinuteClinic</div><div class="cvs-nav-link active">My Account</div><div class="cvs-nav-link">Health</div></div>
+    <div class="cvs-nav-right"><div class="cvs-nav-user"><div class="cvs-nav-avatar">VN</div><span>Hi, Vani</span></div></div>
+  </div>
+  <div class="sub-nav">
+    <a onclick="go(1)">Family Management</a><span class="sub-nav-sep">›</span>
+    <a onclick="go(2)">Add a Child</a><span class="sub-nav-sep">›</span>
+    <span>Use a Prescription Label</span>
+  </div>
+  <div class="page-wrap mid">
+    <div class="page-hd">
+      <h1 class="page-title">Use a prescription label</h1>
+      <p class="page-subtitle">Look up your child using information from one of their prescription bottles</p>
+    </div>
+
+    <div class="search-layout">
+      <div>
+        <div class="alert alert-warning">
+          <span class="alert-icon">⚠️</span>
+          <div>We couldn't find your child using the information provided. Use a prescription label as an alternative way to verify the relationship.</div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-hd">
+            <div class="card-hd-title">Prescription Label Details</div>
+            <div class="card-hd-sub">Enter information exactly as it appears on the label</div>
+          </div>
+          <div class="card-body">
+            <!-- Label diagram -->
+            <div style="background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-md); padding:16px; margin-bottom:20px; display:flex; gap:16px; align-items:center;">
+              <div style="font-size:40px; flex-shrink:0;">🏷️</div>
+              <div>
+                <div style="font-size:13px; font-weight:600; color:var(--text); margin-bottom:4px;">Where to find this information</div>
+                <div style="font-size:12px; color:var(--text-light); line-height:1.6;">Look at the label on your child's prescription bottle. You'll find the Rx number near the top of the label, usually prefixed with "Rx#" or a barcode.</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Rx Number <span class="req">*</span></label>
+              <input class="form-input filled" type="text" value="4782901-01234" readonly />
+              <div class="form-hint">Found on the prescription label, e.g. "Rx# 4782901-01234"</div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">First Name on Label <span class="req">*</span></label>
+                <input class="form-input filled" type="text" value="Emma" readonly />
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Last Name on Label <span class="req">*</span></label>
+                <input class="form-input filled" type="text" value="Nagam" readonly />
+              </div>
+            </div>
+          </div>
+          <div class="card-ft" style="justify-content:space-between;">
+            <button class="btn btn-ghost" onclick="go(2)">← Back</button>
+            <button class="btn btn-primary btn-lg" onclick="go(4)">🔍 Search with Label</button>
+          </div>
+        </div>
+
+        <!-- OTP option -->
+        <div class="alt-connect">
+          <div class="alt-connect-hd">Other options</div>
+          <div class="alt-connect-item">
+            <div class="alt-connect-icon">📱</div>
+            <div class="alt-connect-text">
+              <div class="alt-connect-title">Send a one-time code</div>
+              <div class="alt-connect-desc">Send a verification code to the phone number on the child's pharmacy profile</div>
+            </div>
+            <div class="alt-connect-arrow">›</div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px; padding:16px; background:var(--red-light); border-radius:var(--radius-md); border:1px solid var(--red-mid);">
+          <div style="font-size:13px; font-weight:600; color:var(--text); margin-bottom:6px;">❌ If none of these work</div>
+          <div style="font-size:13px; color:var(--text-mid); line-height:1.6;">If we're unable to verify your child's records through any of these methods, they cannot be added at this time. You may visit a CVS Pharmacy location for in-person assistance.</div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:10px; color:var(--red); padding-left:0;" onclick="go(1)">Exit without adding →</button>
+        </div>
+      </div>
+
+      <div class="sticky-panel">
+        <div class="help-card">
+          <div class="help-card-icon">🏷️</div>
+          <div class="help-card-title">Reading the Rx label</div>
+          <div class="help-card-text">The Rx number is printed on every CVS prescription label and is unique to each filled prescription.</div>
+          <ul class="help-list" style="margin-top:10px;">
+            <li>Located near the top of the label</li>
+            <li>Usually 10–13 digits</li>
+            <li>May include a dash (e.g. 4782901-01234)</li>
+            <li>Name must match the child's name exactly</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 4 · Minor Found — Match & Validation
+══════════════════════════════════════════════ -->
+<div class="screen" id="s4">
+  <div class="cvs-nav">
+    <div class="cvs-logo"><span class="cvs-logo-heart">❤️</span><span class="cvs-logo-text">CVS</span><span class="cvs-logo-tagline">Health</span></div>
+    <div class="cvs-nav-links"><div class="cvs-nav-link">Pharmacy</div><div class="cvs-nav-link">MinuteClinic</div><div class="cvs-nav-link active">My Account</div><div class="cvs-nav-link">Health</div></div>
+    <div class="cvs-nav-right"><div class="cvs-nav-user"><div class="cvs-nav-avatar">VN</div><span>Hi, Vani</span></div></div>
+  </div>
+  <div class="sub-nav">
+    <a onclick="go(1)">Family Management</a><span class="sub-nav-sep">›</span>
+    <a onclick="go(2)">Add a Child</a><span class="sub-nav-sep">›</span>
+    <span>Record Found</span>
+  </div>
+  <div class="page-wrap mid">
+    <div class="page-hd">
+      <h1 class="page-title">We found a match</h1>
+      <p class="page-subtitle">Please confirm this is the child you'd like to add as a caregivee</p>
+    </div>
+
+    <div class="search-layout">
+      <div>
+        <!-- Match card -->
+        <div class="match-card">
+          <div class="match-card-hd">
+            <span style="font-size:20px; color:white;">✓</span>
+            <span class="match-card-hd-text">Pharmacy record found</span>
+          </div>
+          <div class="match-card-body">
+            <div class="match-profile">
+              <div class="match-avatar">EN</div>
+              <div>
+                <div class="match-name">Emma Nagam</div>
+                <div class="match-detail">Minor · CVS Pharmacy® patient</div>
+              </div>
+            </div>
+            <div class="match-fields">
+              <div class="match-field">
+                <div class="match-field-label">Date of Birth</div>
+                <div class="match-field-val">Jun 14, 2015</div>
+              </div>
+              <div class="match-field">
+                <div class="match-field-label">Age</div>
+                <div class="match-field-val">10 years old</div>
+              </div>
+              <div class="match-field">
+                <div class="match-field-label">Pharmacy on File</div>
+                <div class="match-field-val">CVS #2847</div>
+              </div>
+            </div>
+
+            <!-- Validation signals -->
+            <div class="validation-row">
+              <div style="font-size:12px; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:0.4px; width:100%; margin-bottom:4px;">Relationship validation signals</div>
+              <span class="val-badge val-match">✓ Phone &amp; Last Name</span>
+              <span class="val-badge val-match">✓ Phone &amp; ZIP Code</span>
+              <span class="val-badge val-uncheck">— Email</span>
+              <span class="val-badge val-uncheck">— Last Name &amp; Email</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div>Validation checks match shared contact details between your profile and Emma's pharmacy record. Two matching signals confirm the likely relationship.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-body" style="padding:16px 20px;">
+            <div style="font-size:14px; font-weight:600; color:var(--text); margin-bottom:12px;">Is this the right person?</div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-primary btn-lg" onclick="go(5)">Yes, this is Emma — Continue →</button>
+              <button class="btn btn-secondary" onclick="go(2)">No, search again</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sticky-panel">
+        <div class="help-card">
+          <div class="help-card-icon">🔐</div>
+          <div class="help-card-title">How validation works</div>
+          <div class="help-card-text">We compare your pharmacy profile with your child's to detect shared contact details that suggest a valid parent-child relationship.</div>
+          <ul class="help-list" style="margin-top:10px;">
+            <li>Phone &amp; Last Name match</li>
+            <li>Phone &amp; Email match</li>
+            <li>Last Name &amp; Email match</li>
+            <li>Last Name &amp; ZIP Code match</li>
+            <li>Phone &amp; ZIP Code match</li>
+          </ul>
+          <div style="margin-top:12px; font-size:12px; color:var(--text-mid);">At least one signal must match to proceed to attestation.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 5 · Guardian Attestation & PHR Consent
+══════════════════════════════════════════════ -->
+<div class="screen" id="s5">
+  <div class="cvs-nav">
+    <div class="cvs-logo"><span class="cvs-logo-heart">❤️</span><span class="cvs-logo-text">CVS</span><span class="cvs-logo-tagline">Health</span></div>
+    <div class="cvs-nav-links"><div class="cvs-nav-link">Pharmacy</div><div class="cvs-nav-link">MinuteClinic</div><div class="cvs-nav-link active">My Account</div><div class="cvs-nav-link">Health</div></div>
+    <div class="cvs-nav-right"><div class="cvs-nav-user"><div class="cvs-nav-avatar">VN</div><span>Hi, Vani</span></div></div>
+  </div>
+  <div class="sub-nav">
+    <a onclick="go(1)">Family Management</a><span class="sub-nav-sep">›</span>
+    <a onclick="go(2)">Add a Child</a><span class="sub-nav-sep">›</span>
+    <span>Guardian Attestation</span>
+  </div>
+  <div class="page-wrap mid">
+    <div class="page-hd">
+      <h1 class="page-title">Confirm your authority</h1>
+      <p class="page-subtitle">Before adding <strong>Emma Nagam</strong>, please confirm your legal relationship and consent to accessing her pharmacy records</p>
+    </div>
+
+    <div class="consent-layout">
+      <div>
+
+        <!-- Minor info summary -->
+        <div style="display:flex; align-items:center; gap:14px; padding:16px 18px; background:var(--green-light); border:1px solid var(--green-mid); border-radius:var(--radius-lg); margin-bottom:20px;">
+          <div style="width:44px; height:44px; border-radius:22px; background:linear-gradient(135deg,var(--green),#00CC66); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:white; flex-shrink:0;">EN</div>
+          <div>
+            <div style="font-size:15px; font-weight:700; color:var(--text);">Emma Nagam</div>
+            <div style="font-size:13px; color:var(--text-mid);">Date of Birth: June 14, 2015 · Age 10 · CVS Pharmacy #2847</div>
+          </div>
+          <div style="margin-left:auto;"><span class="val-badge val-match" style="font-size:12px;">✓ Validated</span></div>
+        </div>
+
+        <!-- PHR Consent language -->
+        <div class="card" style="margin-bottom:18px;">
+          <div class="card-hd">
+            <div class="card-hd-title">Authorization to Access Minor's Health Records</div>
+            <div class="card-hd-sub">Please read the following carefully before confirming</div>
+          </div>
+          <div class="card-body">
+            <div class="phr-text-box">
+              <p><strong>Personal Health Record (PHR) Access Authorization</strong></p>
+              <p>By confirming guardian status below, you authorize CVS Health to link <strong>Emma Nagam's</strong> pharmacy records to your account and grant you the ability to view and manage her health information, including:</p>
+              <p>
+                <strong>CVS Pharmacy®</strong> — prescription history, refill status, and pickup information<br/>
+                <strong>CVS Caremark®</strong> — mail order prescription details and delivery tracking<br/>
+                <strong>CVS Specialty®</strong> — specialty medication management and clinical information
+              </p>
+              <p>This authorization is subject to applicable federal and state privacy laws, including HIPAA. You understand that:</p>
+              <p>
+                (a) You are solely responsible for maintaining the confidentiality of the minor's health information;<br/>
+                (b) This access may be revoked at any time through Family Management settings;<br/>
+                (c) CVS Health reserves the right to verify guardianship and may require additional documentation;<br/>
+                (d) Providing false information to gain access to a minor's health records may be a violation of state and federal law.
+              </p>
+              <p>This authorization does not transfer any rights or responsibilities associated with the minor's health insurance or benefits coverage.</p>
+            </div>
+
+            <!-- What you'll be able to do -->
+            <div style="margin-bottom:18px;">
+              <div style="font-size:13px; font-weight:600; color:var(--text-mid); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.4px; font-size:11px;">Access being granted</div>
+              <div style="display:flex; flex-direction:column; gap:0; border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden;">
+                <div class="consent-summary-row" style="padding:12px 14px;">
+                  <span class="consent-summary-icon">💊</span>
+                  <div class="consent-summary-text"><strong>View &amp; manage prescriptions</strong> — CVS Pharmacy, Caremark, and Specialty</div>
+                </div>
+                <div class="consent-summary-row" style="padding:12px 14px;">
+                  <span class="consent-summary-icon">📋</span>
+                  <div class="consent-summary-text"><strong>View health records</strong> — immunizations, test results, visit summaries</div>
+                </div>
+                <div class="consent-summary-row" style="padding:12px 14px; border-bottom:none;">
+                  <span class="consent-summary-icon">🏪</span>
+                  <div class="consent-summary-text"><strong>Pharmacy actions</strong> — refill requests, pickup authorization, mail order management</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mandatory guardian checkbox -->
+        <div class="card" style="margin-bottom:18px; border:2px solid var(--red);">
+          <div class="card-hd" style="background:var(--red-light);">
+            <div class="card-hd-title" style="color:var(--red);">⚠️ Required: Guardian Confirmation</div>
+            <div class="card-hd-sub">This checkbox is mandatory. You cannot proceed without confirming your guardian status.</div>
+          </div>
+          <div class="card-body">
+            <div class="checkbox-item checked" id="guardian-checkbox" onclick="toggleGuardian()">
+              <div class="checkbox-box checked" id="guardian-box">
+                <span class="checkbox-check">✓</span>
+              </div>
+              <div class="checkbox-label">
+                I confirm that I am the <strong>legal parent or guardian</strong> of <strong>Emma Nagam</strong> and that I have the legal authority to access, view, and manage her pharmacy and health records on CVS Health. I understand that providing false information is a violation of CVS Health's Terms of Use and may be unlawful.
+              </div>
+            </div>
+
+            <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
+              <div class="secondary-checkbox" onclick="toggleSecondary('sc1')">
+                <div class="secondary-checkbox-box checked" id="sc1-box"><span class="secondary-checkbox-check">✓</span></div>
+                <div class="secondary-checkbox-label">I have read and understand the PHR Access Authorization above</div>
+              </div>
+              <div class="secondary-checkbox" onclick="toggleSecondary('sc2')">
+                <div class="secondary-checkbox-box checked" id="sc2-box"><span class="secondary-checkbox-check">✓</span></div>
+                <div class="secondary-checkbox-label">I understand I can revoke this access at any time from Family Management</div>
+              </div>
+            </div>
+          </div>
+          <div class="card-ft" style="justify-content:space-between; background:var(--red-light);">
+            <button class="btn btn-ghost" onclick="go(4)">← Back</button>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <button class="btn btn-secondary" onclick="go(1)">Cancel</button>
+              <button class="btn btn-primary btn-lg" id="submit-btn" onclick="go(6)">
+                Submit &amp; Add Emma →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-warning">
+          <span class="alert-icon">⚠️</span>
+          <div style="font-size:13px;">If you do not confirm your guardian status, Emma will not be added and no caregiving relationship will be created. There are no partial or pending entries — the process must be completed in full.</div>
+        </div>
+      </div>
+
+      <!-- Right panel -->
+      <div class="sticky-panel">
+        <div class="help-card" style="margin-bottom:16px;">
+          <div class="help-card-icon">🔒</div>
+          <div class="help-card-title">Why we require this</div>
+          <div class="help-card-text">Federal law (HIPAA) and CVS Health policy require explicit guardian confirmation before granting access to a minor's pharmacy and health records.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd"><div class="card-hd-title">What happens next</div></div>
+          <div class="timeline" style="padding:4px 16px 8px;">
+            <div class="timeline-item">
+              <div class="timeline-dot">1</div>
+              <div><div class="timeline-title">Emma is added</div><div class="timeline-desc">She appears in "Who you're caring for"</div></div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot">2</div>
+              <div><div class="timeline-title">Access activated</div><div class="timeline-desc">You can immediately manage her Rx</div></div>
+            </div>
+            <div class="timeline-item" style="border:none;">
+              <div class="timeline-dot">3</div>
+              <div><div class="timeline-title">Consent stored</div><div class="timeline-desc">Your attestation is recorded. No re-attestation needed unless the relationship is revoked.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 6 · Success Confirmation
+══════════════════════════════════════════════ -->
+<div class="screen" id="s6">
+  <div class="cvs-nav">
+    <div class="cvs-logo"><span class="cvs-logo-heart">❤️</span><span class="cvs-logo-text">CVS</span><span class="cvs-logo-tagline">Health</span></div>
+    <div class="cvs-nav-links"><div class="cvs-nav-link">Pharmacy</div><div class="cvs-nav-link">MinuteClinic</div><div class="cvs-nav-link active">My Account</div><div class="cvs-nav-link">Health</div></div>
+    <div class="cvs-nav-right"><div class="cvs-nav-user"><div class="cvs-nav-avatar">VN</div><span>Hi, Vani</span></div></div>
+  </div>
+  <div class="sub-nav">
+    <a onclick="go(1)">Family Management</a><span class="sub-nav-sep">›</span>
+    <span>Emma Added</span>
+  </div>
+  <div class="page-wrap narrow">
+    <div class="card">
+      <div class="card-body">
+        <div class="success-hero">
+          <div class="success-circle">✓</div>
+          <h1 class="success-title">Emma Nagam has been added</h1>
+          <p class="success-sub">You can now view and manage Emma's prescriptions across CVS Pharmacy®, CVS Caremark®, and CVS Specialty®.</p>
+        </div>
+
+        <!-- Minor summary -->
+        <div style="background:var(--bg); border-radius:var(--radius-lg); padding:18px 20px; margin-bottom:24px; border:1px solid var(--border);">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <div style="width:48px; height:48px; border-radius:24px; background:linear-gradient(135deg,var(--green),#00CC66); display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:700; color:white; flex-shrink:0;">EN</div>
+            <div style="flex:1;">
+              <div style="font-size:15px; font-weight:700; color:var(--text);">Emma Nagam</div>
+              <div style="font-size:13px; color:var(--text-light);">Date of Birth: June 14, 2015 · Minor</div>
+            </div>
+            <span class="val-badge val-match">✓ Guardian Confirmed</span>
+          </div>
+          <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;">
+            <span style="font-size:12px; background:white; border:1px solid var(--border); padding:4px 10px; border-radius:20px; color:var(--text-mid);">💊 CVS Pharmacy®</span>
+            <span style="font-size:12px; background:white; border:1px solid var(--border); padding:4px 10px; border-radius:20px; color:var(--text-mid);">📦 CVS Caremark®</span>
+            <span style="font-size:12px; background:white; border:1px solid var(--border); padding:4px 10px; border-radius:20px; color:var(--text-mid);">🔬 CVS Specialty®</span>
+          </div>
+        </div>
+
+        <!-- Attestation stored confirmation -->
+        <div class="alert alert-success" style="margin-bottom:20px;">
+          <span class="alert-icon">✓</span>
+          <div style="font-size:13px;"><strong>Guardian attestation recorded.</strong> Your confirmation has been securely stored. No further attestation is required unless this caregiving relationship is removed and re-added.</div>
+        </div>
+
+        <!-- Next actions -->
+        <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+          <button class="btn btn-primary btn-lg" onclick="go(7)">💊 Manage Emma's Rx →</button>
+          <button class="btn btn-secondary btn-lg" onclick="go(7)">← Back to Family Management</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SCREEN 7 · Family Management — Updated
+══════════════════════════════════════════════ -->
+<div class="screen" id="s7">
+  <div class="cvs-nav">
+    <div class="cvs-logo"><span class="cvs-logo-heart">❤️</span><span class="cvs-logo-text">CVS</span><span class="cvs-logo-tagline">Health</span></div>
+    <div class="cvs-nav-links"><div class="cvs-nav-link">Pharmacy</div><div class="cvs-nav-link">MinuteClinic</div><div class="cvs-nav-link active">My Account</div><div class="cvs-nav-link">Health</div></div>
+    <div class="cvs-nav-right"><div class="cvs-nav-user"><div class="cvs-nav-avatar">VN</div><span>Hi, Vani</span></div></div>
+  </div>
+  <div class="sub-nav"><a>My Account</a><span class="sub-nav-sep">›</span><span>Family Management</span></div>
+  <div class="page-wrap">
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px;">
+      <div>
+        <h1 class="page-title">Add and manage people</h1>
+        <p class="page-subtitle">Manage caregiving relationships and access to pharmacy records</p>
+      </div>
+      <button class="btn btn-primary" onclick="go(2)">+ Add another</button>
+    </div>
+
+    <!-- Success toast -->
+    <div class="alert alert-success" style="margin-bottom:24px;">
+      <span class="alert-icon">✅</span>
+      <div><strong>Emma Nagam has been added.</strong> You can now manage her prescriptions across CVS Pharmacy, Caremark, and Specialty.</div>
+    </div>
+
+    <div class="fam-layout">
+      <div>
+        <!-- Who you're caring for — now includes Emma -->
+        <div class="fam-section">
+          <div class="section-label">Who you're caring for</div>
+
+          <!-- Emma — newly added -->
+          <div class="minor-profile-card">
+            <div class="minor-profile-avatar">EN</div>
+            <div class="minor-profile-info">
+              <div class="minor-profile-name">
+                Emma Nagam
+                <span class="minor-profile-new">New</span>
+                <span class="member-badge badge-minor" style="margin-left:6px;">Minor</span>
+              </div>
+              <div class="minor-profile-meta">Date of Birth: June 14, 2015 · Guardian confirmed</div>
+            </div>
+            <button class="btn btn-primary btn-sm">Manage Emma</button>
+          </div>
+
+          <div class="member-card">
+            <div class="member-avatar av-blue">MJ</div>
+            <div class="member-info">
+              <div class="member-name">Maria Johnson <span class="member-badge badge-caregiver" style="margin-left:6px;">Caregiver</span></div>
+              <div class="member-meta">Spouse · Active since Jan 2026</div>
+            </div>
+            <button class="btn btn-secondary btn-sm">Manage Maria</button>
+          </div>
+        </div>
+
+        <!-- Add more -->
+        <div class="fam-section">
+          <div class="section-label">Add people and pets</div>
+          <div class="add-grid">
+            <div class="add-tile" onclick="go(2)">
+              <div class="add-tile-icon">👧</div>
+              <div class="add-tile-label">Add a child</div>
+              <div class="add-tile-desc">Under 18 years old</div>
+            </div>
+            <div class="add-tile">
+              <div class="add-tile-icon">🧑</div>
+              <div class="add-tile-label">Add an adult</div>
+              <div class="add-tile-desc">18 years or older</div>
+            </div>
+            <div class="add-tile">
+              <div class="add-tile-icon">🐾</div>
+              <div class="add-tile-label">Add a pet</div>
+              <div class="add-tile-desc">Manage pet prescriptions</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Caregivers for you -->
+        <div class="fam-section">
+          <div class="section-label">People who care for you</div>
+          <div class="member-card">
+            <div class="member-avatar av-purple">RN</div>
+            <div class="member-info">
+              <div class="member-name">Raj Nagam <span class="member-badge badge-caregiver" style="margin-left:6px;">Caregiver</span></div>
+              <div class="member-meta">Spouse · Active since Mar 2025</div>
+            </div>
+            <button class="btn btn-secondary btn-sm">Manage</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <div class="card-hd"><div class="card-hd-title">About Family Management</div></div>
+          <div class="card-body" style="font-size:13px; color:var(--text-mid); line-height:1.7;">
+            <p style="margin-bottom:12px;">Manage who can view and take action on prescriptions across:</p>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; gap:8px; align-items:center;"><span style="font-size:16px;">💊</span><span>CVS Pharmacy®</span></div>
+              <div style="display:flex; gap:8px; align-items:center;"><span style="font-size:16px;">📦</span><span>CVS Caremark®</span></div>
+              <div style="display:flex; gap:8px; align-items:center;"><span style="font-size:16px;">🔬</span><span>CVS Specialty®</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  function go(n) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('s' + n).classList.add('active');
+    // map screen numbers to toolbar pill indices
+    const map = {1:0, 2:1, 3:3, 4:5, 5:6, 6:7, 7:8};
+    document.querySelectorAll('.proto-step').forEach((s, i) => {
+      s.classList.toggle('active', i === (map[n] !== undefined ? map[n] : n - 1));
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleGuardian() {
+    const box = document.getElementById('guardian-box');
+    const item = document.getElementById('guardian-checkbox');
+    box.classList.toggle('checked');
+    item.classList.toggle('checked');
+  }
+
+  function toggleSecondary(id) {
+    const box = document.getElementById(id + '-box');
+    box.classList.toggle('checked');
+  }
+</script>
+</body>
+</html>
