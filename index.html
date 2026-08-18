@@ -271,13 +271,13 @@
     <div class="proto-divider"></div>
     <div class="proto-step alt" onclick="go(3)">3 · Alt: Rx Label Lookup</div>
     <div class="proto-divider"></div>
-    <div class="proto-step" onclick="go(4)">4 · Minor Found ✓</div>
-    <div class="proto-step" onclick="go(5)">5 · Guardian Attestation</div>
-    <div class="proto-step" onclick="go(6)">6 · PHR Consent</div>
+    <div class="proto-step" onclick="go(4)">4 · CVS Record Found</div>
+    <div class="proto-step" onclick="go(5)">5 · Establish Relationship</div>
+    <div class="proto-step" onclick="go(6)">6 · Authorize PHR Access</div>
     <div class="proto-step" onclick="go(7)">7 · Confirmation</div>
     <div class="proto-step" onclick="go(8)">8 · Family Management Updated</div>
   </div>
-  <span class="proto-note">TLACCAKRAK-960 / -961 · Add Minor Caregivee</span>
+  <span class="proto-note">TLACCAKRAK-960 / -961 · Add Minor Caregivee · Phase 1</span>
 </div>
 
 
@@ -297,10 +297,19 @@
   </div>
   <div class="sub-nav"><a>My Account</a><span class="sub-nav-sep">›</span><span>Family Management</span></div>
   <div class="page-wrap">
-    <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:28px;">
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px;">
       <div>
         <h1 class="page-title">Add and manage people</h1>
-        <p class="page-subtitle">Manage caregiving relationships and access to pharmacy records</p>
+        <p class="page-subtitle">Manage caregiving relationships and health record authorization separately</p>
+      </div>
+    </div>
+
+    <!-- Action needed banner — existing minor missing PHR authorization -->
+    <div class="alert alert-warning" style="margin-bottom:24px;">
+      <span class="alert-icon">⚠️</span>
+      <div>
+        <strong>Action needed:</strong> Olivia Nagam has an active caregiving relationship but <strong>PHR access has not been authorized.</strong> Without authorization, you cannot view or manage her pharmacy records.
+        <div style="margin-top:8px;"><button class="btn btn-sm" style="background:var(--yellow-dark); color:white; border:none;" onclick="go(6)">Authorize PHR Access for Olivia →</button></div>
       </div>
     </div>
 
@@ -309,6 +318,21 @@
         <!-- Who you're caring for -->
         <div class="fam-section">
           <div class="section-label">Who you're caring for</div>
+
+          <!-- Olivia — existing relationship, PHR not authorized -->
+          <div class="member-card" style="border-color:var(--yellow-mid); background:var(--yellow);">
+            <div class="member-avatar" style="background:linear-gradient(135deg,#B07800,#E0A800);">ON</div>
+            <div class="member-info">
+              <div class="member-name">
+                Olivia Nagam
+                <span class="member-badge" style="background:#FFF3C0; color:#7A5C00; margin-left:6px;">Minor</span>
+                <span class="member-badge" style="background:#FFF3C0; color:#7A5C00; border:1px solid var(--yellow-mid); margin-left:4px;">⚠️ PHR Access Required</span>
+              </div>
+              <div class="member-meta">Caregiving relationship: Active · PHR authorization: Not granted</div>
+            </div>
+            <button class="btn btn-sm" style="background:var(--yellow-dark); color:white; border:none;" onclick="go(6)">Authorize PHR</button>
+          </div>
+
           <div class="member-card">
             <div class="member-avatar av-blue">MJ</div>
             <div class="member-info">
@@ -319,24 +343,24 @@
           </div>
         </div>
 
-        <!-- Add people and pets -->
+        <!-- Add people -->
         <div class="fam-section">
-          <div class="section-label">Add people and pets</div>
+          <div class="section-label">Add people</div>
           <div class="add-grid">
             <div class="add-tile highlight" onclick="go(2)">
               <div class="add-tile-icon">👧</div>
               <div class="add-tile-label">Add a child</div>
-              <div class="add-tile-desc">Under 18 years old</div>
+              <div class="add-tile-desc">Under 18 · CVS-connected</div>
             </div>
             <div class="add-tile">
               <div class="add-tile-icon">🧑</div>
               <div class="add-tile-label">Add an adult</div>
               <div class="add-tile-desc">18 years or older</div>
             </div>
-            <div class="add-tile">
+            <div class="add-tile" style="opacity:0.45; cursor:not-allowed;" title="Pets are not in scope for Phase 1">
               <div class="add-tile-icon">🐾</div>
-              <div class="add-tile-label">Add a pet</div>
-              <div class="add-tile-desc">Manage pet prescriptions</div>
+              <div class="add-tile-label" style="color:var(--text-light);">Add a pet</div>
+              <div class="add-tile-desc" style="color:#AAA;">Coming in a future phase</div>
             </div>
           </div>
         </div>
@@ -357,17 +381,34 @@
 
       <!-- Side panel -->
       <div>
-        <div class="card">
-          <div class="card-hd"><div class="card-hd-title">About Family Management</div></div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-hd" style="background:var(--blue-light); border-bottom-color:var(--blue-mid);">
+            <div class="card-hd-title" style="color:var(--blue);">Phase 1 · CVS-Connected Minors</div>
+            <div class="card-hd-sub" style="color:#4466AA;">Currently in scope for this release</div>
+          </div>
           <div class="card-body" style="font-size:13px; color:var(--text-mid); line-height:1.7;">
-            <p style="margin-bottom:12px;">Manage who can view and take action on prescriptions across:</p>
-            <div style="display:flex; flex-direction:column; gap:8px;">
-              <div style="display:flex; gap:8px; align-items:center;"><span style="font-size:16px;">💊</span><span>CVS Pharmacy®</span></div>
-              <div style="display:flex; gap:8px; align-items:center;"><span style="font-size:16px;">📦</span><span>CVS Caremark®</span></div>
-              <div style="display:flex; gap:8px; align-items:center;"><span style="font-size:16px;">🔬</span><span>CVS Specialty®</span></div>
+            <p style="margin-bottom:10px;">Children with existing pharmacy records at a CVS line of business can be added in Phase 1:</p>
+            <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;">
+              <div style="display:flex; gap:8px; align-items:center;"><span style="font-size:15px;">💊</span><span>CVS Pharmacy®</span></div>
+              <div style="display:flex; gap:8px; align-items:center;"><span style="font-size:15px;">📦</span><span>CVS Caremark®</span></div>
+              <div style="display:flex; gap:8px; align-items:center;"><span style="font-size:15px;">🔬</span><span>CVS Specialty®</span></div>
             </div>
-            <div class="divider"></div>
-            <p style="font-size:12px; color:var(--text-light);">Adding a child requires verification that you are their legal guardian or parent.</p>
+            <div style="padding:10px 12px; background:var(--bg); border-radius:var(--radius-sm); font-size:12px; color:var(--text-light);">Adults, pets, and minors without CVS records are out of scope for Phase 1.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><div class="card-hd-title">Two separate steps</div></div>
+          <div class="card-body" style="font-size:13px; color:var(--text-mid); line-height:1.6;">
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <div style="display:flex; gap:10px; align-items:flex-start;">
+                <span style="width:22px; height:22px; border-radius:11px; background:var(--green); color:white; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">1</span>
+                <div><strong style="color:var(--text);">Caregiving Relationship</strong><br/>Establish that you are a legal guardian of the child.</div>
+              </div>
+              <div style="display:flex; gap:10px; align-items:flex-start;">
+                <span style="width:22px; height:22px; border-radius:11px; background:var(--blue); color:white; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;">2</span>
+                <div><strong style="color:var(--text);">PHR Authorization</strong><br/>Separately grant access to pharmacy and health records.</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -392,6 +433,14 @@
     <div class="page-hd">
       <h1 class="page-title">Who are you caring for?</h1>
       <p class="page-subtitle">Enter your child's information to find their pharmacy records</p>
+    </div>
+
+    <!-- Phase 1 scope callout -->
+    <div class="alert alert-info" style="margin-bottom:20px;">
+      <span class="alert-icon">ℹ️</span>
+      <div>
+        <strong>Phase 1 — CVS-connected minors only.</strong> Your child must already have a pharmacy record at CVS Pharmacy®, CVS Caremark®, or CVS Specialty® to be added at this time.
+      </div>
     </div>
 
     <div class="search-layout">
@@ -608,8 +657,8 @@
   </div>
   <div class="page-wrap mid">
     <div class="page-hd">
-      <h1 class="page-title">We found a match</h1>
-      <p class="page-subtitle">A pharmacy record was found for the information you provided</p>
+      <h1 class="page-title">CVS-connected minor found</h1>
+      <p class="page-subtitle">A pharmacy record was found. You can now establish a caregiving relationship — PHR authorization is a separate step.</p>
     </div>
 
     <div class="search-layout">
@@ -618,7 +667,7 @@
         <div class="match-card">
           <div class="match-card-hd">
             <span style="font-size:20px; color:white;">✓</span>
-            <span class="match-card-hd-text">Pharmacy record found</span>
+            <span class="match-card-hd-text">CVS pharmacy record found — relationship can be established</span>
           </div>
           <div class="match-card-body">
             <div class="match-profile">
@@ -654,14 +703,30 @@
           </div>
         </div>
 
-        <div class="alert alert-info">
-          <span class="alert-icon">ℹ️</span>
-          <div>Validation checks match shared contact details between your profile and Emma's pharmacy record. Two matching signals confirm the likely relationship.</div>
+        <!-- Two-step callout -->
+        <div style="border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; margin-bottom:16px;">
+          <div style="padding:12px 16px; background:var(--bg); border-bottom:1px solid var(--border); font-size:12px; font-weight:700; color:var(--text-light); text-transform:uppercase; letter-spacing:0.5px;">What happens next — 2 separate steps</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0;">
+            <div style="padding:14px 16px; border-right:1px solid var(--border);">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                <span style="width:20px; height:20px; border-radius:10px; background:var(--green); color:white; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">1</span>
+                <span style="font-size:13px; font-weight:600; color:var(--green);">Caregiving Relationship</span>
+              </div>
+              <div style="font-size:12px; color:var(--text-mid); line-height:1.5;">Confirm you are Emma's legal guardian. This creates the caregiving relationship.</div>
+            </div>
+            <div style="padding:14px 16px;">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                <span style="width:20px; height:20px; border-radius:10px; background:var(--blue); color:white; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">2</span>
+                <span style="font-size:13px; font-weight:600; color:var(--blue);">PHR Authorization</span>
+              </div>
+              <div style="font-size:12px; color:var(--text-mid); line-height:1.5;">Separately authorize access to Emma's pharmacy and health records.</div>
+            </div>
+          </div>
         </div>
 
         <div class="card-ft" style="background:white; border:1px solid var(--border); border-radius:var(--radius-lg); justify-content:space-between; display:flex; padding:14px 20px;">
           <button class="btn btn-ghost" onclick="go(2)">← Search again</button>
-          <button class="btn btn-primary btn-lg" onclick="go(5)">Continue to Guardian Attestation →</button>
+          <button class="btn btn-primary btn-lg" onclick="go(5)">Establish Caregiving Relationship →</button>
         </div>
       </div>
 
@@ -677,7 +742,7 @@
             <li>Last Name &amp; ZIP Code match</li>
             <li>Phone &amp; ZIP Code match</li>
           </ul>
-          <div style="margin-top:12px; font-size:12px; color:var(--text-mid);">At least one signal must match to proceed to attestation.</div>
+          <div style="margin-top:12px; font-size:12px; color:var(--text-mid);">At least one signal must match to proceed.</div>
         </div>
       </div>
     </div>
@@ -697,21 +762,21 @@
   <div class="sub-nav">
     <a onclick="go(1)">Family Management</a><span class="sub-nav-sep">›</span>
     <a onclick="go(2)">Add a Child</a><span class="sub-nav-sep">›</span>
-    <span>Guardian Attestation</span>
+    <span>Establish Caregiving Relationship</span>
   </div>
   <div class="page-wrap mid">
     <div class="page-hd">
-      <h1 class="page-title">Confirm your guardian status</h1>
-      <p class="page-subtitle">Before we continue, you must confirm that you are the legal parent or guardian of <strong>Emma Nagam</strong></p>
+      <h1 class="page-title">Establish caregiving relationship</h1>
+      <p class="page-subtitle">Confirm your legal guardian status to create the caregiving relationship with <strong>Emma Nagam</strong>. PHR authorization is a separate step.</p>
     </div>
 
     <div class="consent-layout">
       <div>
         <!-- Step indicator -->
         <div style="display:flex; align-items:center; gap:8px; margin-bottom:24px;">
-          <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--red);"><span style="width:24px; height:24px; border-radius:12px; background:var(--red); color:white; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">1</span> Guardian Attestation</div>
+          <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--green);"><span style="width:24px; height:24px; border-radius:12px; background:var(--green); color:white; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">1</span> Caregiving Relationship</div>
           <div style="flex:1; height:2px; background:var(--border);"></div>
-          <div style="display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text-light);"><span style="width:24px; height:24px; border-radius:12px; background:var(--border); color:var(--text-light); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">2</span> PHR Consent</div>
+          <div style="display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text-light);"><span style="width:24px; height:24px; border-radius:12px; background:var(--border); color:var(--text-light); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">2</span> PHR Authorization</div>
         </div>
 
         <!-- Minor info summary -->
@@ -726,26 +791,26 @@
 
         <!-- Mandatory guardian checkbox -->
         <div class="card" style="margin-bottom:18px; border:2px solid var(--red);">
-          <div class="card-hd" style="background:var(--red-light);">
-            <div class="card-hd-title" style="color:var(--red);">⚠️ Required: Guardian Confirmation</div>
-            <div class="card-hd-sub">You must confirm your legal relationship before proceeding to PHR consent</div>
+          <div class="card-hd" style="background:var(--green-light);">
+            <div class="card-hd-title" style="color:var(--green);">Required: Guardian Confirmation</div>
+            <div class="card-hd-sub">Confirm your legal status to establish the caregiving relationship — PHR authorization comes next</div>
           </div>
           <div class="card-body">
-            <div class="checkbox-item checked" id="guardian-checkbox" onclick="toggleGuardian()">
-              <div class="checkbox-box checked" id="guardian-box">
+            <div class="checkbox-item checked" id="guardian-checkbox" onclick="toggleGuardian()" style="background:var(--green-light); border-color:var(--green-mid);">
+              <div class="checkbox-box checked" id="guardian-box" style="border-color:var(--green); background:var(--green);">
                 <span class="checkbox-check">✓</span>
               </div>
               <div class="checkbox-label">
-                I confirm that I am the <strong>legal parent or guardian</strong> of <strong>Emma Nagam</strong> and that I have the legal authority to access, view, and manage her pharmacy and health records on CVS Health. I understand that providing false information is a violation of CVS Health's Terms of Use and may be unlawful.
+                I confirm that I am the <strong>legal parent or guardian</strong> of <strong>Emma Nagam</strong> and that I have the legal authority to establish a caregiving relationship on her behalf through CVS Health. I understand that this creates a caregiving relationship and that health record access requires a separate authorization step.
               </div>
             </div>
           </div>
-          <div class="card-ft" style="justify-content:space-between; background:var(--red-light);">
+          <div class="card-ft" style="justify-content:space-between; background:var(--green-light);">
             <button class="btn btn-ghost" onclick="go(4)">← Back</button>
             <div style="display:flex; gap:10px; align-items:center;">
               <button class="btn btn-secondary" onclick="go(1)">Cancel</button>
-              <button class="btn btn-primary btn-lg" onclick="go(6)">
-                Continue to PHR Consent →
+              <button class="btn btn-green btn-lg" onclick="go(6)">
+                Create Relationship &amp; Authorize PHR →
               </button>
             </div>
           </div>
@@ -753,7 +818,7 @@
 
         <div class="alert alert-warning">
           <span class="alert-icon">⚠️</span>
-          <div style="font-size:13px;">If you do not confirm your guardian status, Emma will not be added and no caregiving relationship will be created.</div>
+          <div style="font-size:13px;">If you do not confirm your guardian status, no caregiving relationship will be created and Emma will not be added to your account.</div>
         </div>
       </div>
 
@@ -768,12 +833,12 @@
           <div class="card-hd"><div class="card-hd-title">Two steps to add Emma</div></div>
           <div class="timeline" style="padding:4px 16px 8px;">
             <div class="timeline-item">
-              <div class="timeline-dot" style="background:var(--red); color:white;">1</div>
-              <div><div class="timeline-title" style="color:var(--red);">Guardian Attestation</div><div class="timeline-desc">Confirm you are Emma's legal parent or guardian</div></div>
+              <div class="timeline-dot" style="background:var(--green); color:white;">1</div>
+              <div><div class="timeline-title" style="color:var(--green);">Caregiving Relationship</div><div class="timeline-desc">Confirm you are Emma's legal parent or guardian — establishes the relationship</div></div>
             </div>
             <div class="timeline-item" style="border:none;">
-              <div class="timeline-dot">2</div>
-              <div><div class="timeline-title">PHR Consent</div><div class="timeline-desc">Review and accept access to Emma's health records</div></div>
+              <div class="timeline-dot" style="background:var(--blue-light); color:var(--blue);">2</div>
+              <div><div class="timeline-title" style="color:var(--blue);">PHR Authorization</div><div class="timeline-desc">Separately grant access to Emma's pharmacy and health records</div></div>
             </div>
           </div>
         </div>
@@ -799,27 +864,30 @@
   </div>
   <div class="page-wrap mid">
     <div class="page-hd">
-      <h1 class="page-title">Authorize access to health records</h1>
-      <p class="page-subtitle">Review the Personal Health Record access you are granting for <strong>Emma Nagam</strong></p>
+      <h1 class="page-title">Authorize PHR access</h1>
+      <p class="page-subtitle">The caregiving relationship has been created. Now authorize access to <strong>Emma Nagam's</strong> Personal Health Record — this is a separate step.</p>
     </div>
 
     <div class="consent-layout">
       <div>
         <!-- Step indicator -->
         <div style="display:flex; align-items:center; gap:8px; margin-bottom:24px;">
-          <div style="display:flex; align-items:center; gap:6px; font-size:13px; color:var(--green); font-weight:600;"><span style="width:24px; height:24px; border-radius:12px; background:var(--green); color:white; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">✓</span> Guardian Attestation</div>
-          <div style="flex:1; height:2px; background:var(--red);"></div>
-          <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--red);"><span style="width:24px; height:24px; border-radius:12px; background:var(--red); color:white; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">2</span> PHR Consent</div>
+          <div style="display:flex; align-items:center; gap:6px; font-size:13px; color:var(--green); font-weight:600;"><span style="width:24px; height:24px; border-radius:12px; background:var(--green); color:white; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">✓</span> Caregiving Relationship</div>
+          <div style="flex:1; height:2px; background:var(--blue);"></div>
+          <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--blue);"><span style="width:24px; height:24px; border-radius:12px; background:var(--blue); color:white; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">2</span> PHR Authorization</div>
         </div>
 
         <!-- Minor info summary -->
-        <div style="display:flex; align-items:center; gap:14px; padding:16px 18px; background:var(--green-light); border:1px solid var(--green-mid); border-radius:var(--radius-lg); margin-bottom:20px;">
+        <div style="display:flex; align-items:center; gap:14px; padding:16px 18px; background:var(--blue-light); border:1px solid var(--blue-mid); border-radius:var(--radius-lg); margin-bottom:20px;">
           <div style="width:44px; height:44px; border-radius:22px; background:linear-gradient(135deg,var(--green),#00CC66); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:white; flex-shrink:0;">EN</div>
           <div>
             <div style="font-size:15px; font-weight:700; color:var(--text);">Emma Nagam</div>
             <div style="font-size:13px; color:var(--text-mid);">Date of Birth: June 14, 2015 · Age 10 · CVS Pharmacy #2847</div>
           </div>
-          <div style="margin-left:auto;"><span class="val-badge val-match" style="font-size:12px;">✓ Guardian Confirmed</span></div>
+          <div style="margin-left:auto; display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
+            <span class="val-badge val-match" style="font-size:11px;">✓ Relationship Active</span>
+            <span class="val-badge" style="background:var(--blue-light); color:var(--blue); border:1px solid var(--blue-mid); font-size:11px;">PHR: Pending Authorization</span>
+          </div>
         </div>
 
         <!-- PHR Authorization text -->
@@ -877,8 +945,8 @@
             <button class="btn btn-ghost" onclick="go(5)">← Back</button>
             <div style="display:flex; gap:10px; align-items:center;">
               <button class="btn btn-secondary" onclick="go(1)">Cancel</button>
-              <button class="btn btn-primary btn-lg" onclick="go(7)">
-                Accept &amp; Add Emma →
+              <button class="btn btn-blue btn-lg" onclick="go(7)">
+                Authorize PHR Access →
               </button>
             </div>
           </div>
@@ -934,18 +1002,37 @@
         <div class="success-hero">
           <div class="success-circle">✓</div>
           <h1 class="success-title">Emma Nagam has been added</h1>
-          <p class="success-sub">You can now view and manage Emma's prescriptions across CVS Pharmacy®, CVS Caremark®, and CVS Specialty®.</p>
+          <p class="success-sub">Caregiving relationship established and PHR access authorized. You can now manage Emma's prescriptions across all CVS lines of business.</p>
+        </div>
+
+        <!-- Two separate confirmations -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px;">
+          <div style="background:var(--green-light); border:1.5px solid var(--green-mid); border-radius:var(--radius-lg); padding:16px 18px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+              <span style="width:28px; height:28px; border-radius:14px; background:var(--green); color:white; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">✓</span>
+              <span style="font-size:14px; font-weight:700; color:var(--green);">Caregiving Relationship</span>
+            </div>
+            <div style="font-size:12px; color:var(--text-mid); line-height:1.5;">Guardian status confirmed. Emma's caregiving relationship is now active.</div>
+            <div style="margin-top:8px; font-size:11px; color:var(--text-light);">Established: Aug 18, 2026</div>
+          </div>
+          <div style="background:var(--blue-light); border:1.5px solid var(--blue-mid); border-radius:var(--radius-lg); padding:16px 18px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+              <span style="width:28px; height:28px; border-radius:14px; background:var(--blue); color:white; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">✓</span>
+              <span style="font-size:14px; font-weight:700; color:var(--blue);">PHR Authorization</span>
+            </div>
+            <div style="font-size:12px; color:var(--text-mid); line-height:1.5;">Access to Emma's pharmacy and health records has been authorized.</div>
+            <div style="margin-top:8px; font-size:11px; color:var(--text-light);">Authorized: Aug 18, 2026</div>
+          </div>
         </div>
 
         <!-- Minor summary -->
-        <div style="background:var(--bg); border-radius:var(--radius-lg); padding:18px 20px; margin-bottom:24px; border:1px solid var(--border);">
+        <div style="background:var(--bg); border-radius:var(--radius-lg); padding:18px 20px; margin-bottom:20px; border:1px solid var(--border);">
           <div style="display:flex; align-items:center; gap:14px;">
             <div style="width:48px; height:48px; border-radius:24px; background:linear-gradient(135deg,var(--green),#00CC66); display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:700; color:white; flex-shrink:0;">EN</div>
             <div style="flex:1;">
               <div style="font-size:15px; font-weight:700; color:var(--text);">Emma Nagam</div>
               <div style="font-size:13px; color:var(--text-light);">Date of Birth: June 14, 2015 · Minor</div>
             </div>
-            <span class="val-badge val-match">✓ Guardian Confirmed</span>
           </div>
           <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;">
             <span style="font-size:12px; background:white; border:1px solid var(--border); padding:4px 10px; border-radius:20px; color:var(--text-mid);">💊 CVS Pharmacy®</span>
@@ -954,10 +1041,10 @@
           </div>
         </div>
 
-        <!-- Attestation stored confirmation -->
-        <div class="alert alert-success" style="margin-bottom:20px;">
-          <span class="alert-icon">✓</span>
-          <div style="font-size:13px;"><strong>Guardian attestation recorded.</strong> Your confirmation has been securely stored. No further attestation is required unless this caregiving relationship is removed and re-added.</div>
+        <!-- Note about separate management -->
+        <div class="alert alert-info" style="margin-bottom:20px;">
+          <span class="alert-icon">ℹ️</span>
+          <div style="font-size:13px;">Caregiving relationship and PHR authorization can be managed independently from <strong>Family Management</strong>. You can revoke PHR access without removing the caregiving relationship.</div>
         </div>
 
         <!-- Next actions -->
@@ -993,7 +1080,7 @@
     <!-- Success toast -->
     <div class="alert alert-success" style="margin-bottom:24px;">
       <span class="alert-icon">✅</span>
-      <div><strong>Emma Nagam has been added.</strong> You can now manage her prescriptions across CVS Pharmacy, Caremark, and Specialty.</div>
+      <div><strong>Emma Nagam has been added.</strong> Caregiving relationship and PHR authorization are both active. You can now manage her prescriptions across CVS Pharmacy, Caremark, and Specialty.</div>
     </div>
 
     <div class="fam-layout">
@@ -1002,8 +1089,8 @@
         <div class="fam-section">
           <div class="section-label">Who you're caring for</div>
 
-          <!-- Emma — newly added -->
-          <div class="minor-profile-card">
+          <!-- Emma — newly added, both statuses active -->
+          <div class="minor-profile-card" style="border-color:var(--green);">
             <div class="minor-profile-avatar">EN</div>
             <div class="minor-profile-info">
               <div class="minor-profile-name">
@@ -1011,9 +1098,33 @@
                 <span class="minor-profile-new">New</span>
                 <span class="member-badge badge-minor" style="margin-left:6px;">Minor</span>
               </div>
-              <div class="minor-profile-meta">Date of Birth: June 14, 2015 · Guardian confirmed</div>
+              <div style="display:flex; gap:6px; margin-top:5px; flex-wrap:wrap;">
+                <span class="member-badge" style="background:var(--green-light); color:var(--green); font-size:11px;">✓ Relationship Active</span>
+                <span class="member-badge" style="background:var(--blue-light); color:var(--blue); font-size:11px;">✓ PHR Authorized</span>
+              </div>
+              <div style="margin-top:6px; font-size:12px; color:var(--text-light);">DOB: June 14, 2015 · CVS Pharmacy #2847</div>
             </div>
-            <button class="btn btn-primary btn-sm">Manage Emma</button>
+            <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+              <button class="btn btn-primary btn-sm">Manage Emma</button>
+              <button class="btn btn-ghost btn-sm" style="font-size:11px; color:var(--text-light); padding:4px 8px;">Revoke PHR Access</button>
+            </div>
+          </div>
+
+          <!-- Olivia — existing relationship, PHR not authorized -->
+          <div class="member-card" style="border-color:var(--yellow-mid); background:var(--yellow);">
+            <div class="member-avatar" style="background:linear-gradient(135deg,#B07800,#E0A800);">ON</div>
+            <div class="member-info">
+              <div class="member-name">
+                Olivia Nagam
+                <span class="member-badge" style="background:#FFF3C0; color:#7A5C00; margin-left:6px;">Minor</span>
+              </div>
+              <div style="display:flex; gap:6px; margin-top:5px; flex-wrap:wrap;">
+                <span class="member-badge" style="background:var(--green-light); color:var(--green); font-size:11px;">✓ Relationship Active</span>
+                <span class="member-badge" style="background:#FFF3C0; color:#7A5C00; border:1px solid var(--yellow-mid); font-size:11px;">⚠️ PHR Not Authorized</span>
+              </div>
+              <div style="margin-top:6px; font-size:12px; color:var(--text-light);">DOB: March 3, 2018 · PHR access not yet granted</div>
+            </div>
+            <button class="btn btn-sm" style="background:var(--yellow-dark); color:white; border:none;" onclick="go(6)">Authorize PHR</button>
           </div>
 
           <div class="member-card">
@@ -1028,22 +1139,22 @@
 
         <!-- Add more -->
         <div class="fam-section">
-          <div class="section-label">Add people and pets</div>
+          <div class="section-label">Add people</div>
           <div class="add-grid">
             <div class="add-tile" onclick="go(2)">
               <div class="add-tile-icon">👧</div>
               <div class="add-tile-label">Add a child</div>
-              <div class="add-tile-desc">Under 18 years old</div>
+              <div class="add-tile-desc">Under 18 · CVS-connected</div>
             </div>
             <div class="add-tile">
               <div class="add-tile-icon">🧑</div>
               <div class="add-tile-label">Add an adult</div>
               <div class="add-tile-desc">18 years or older</div>
             </div>
-            <div class="add-tile">
+            <div class="add-tile" style="opacity:0.45; cursor:not-allowed;" title="Pets are not in scope for Phase 1">
               <div class="add-tile-icon">🐾</div>
-              <div class="add-tile-label">Add a pet</div>
-              <div class="add-tile-desc">Manage pet prescriptions</div>
+              <div class="add-tile-label" style="color:var(--text-light);">Add a pet</div>
+              <div class="add-tile-desc" style="color:#AAA;">Coming in a future phase</div>
             </div>
           </div>
         </div>
@@ -1063,15 +1174,15 @@
       </div>
 
       <div>
-        <div class="card">
-          <div class="card-hd"><div class="card-hd-title">About Family Management</div></div>
-          <div class="card-body" style="font-size:13px; color:var(--text-mid); line-height:1.7;">
-            <p style="margin-bottom:12px;">Manage who can view and take action on prescriptions across:</p>
-            <div style="display:flex; flex-direction:column; gap:8px;">
-              <div style="display:flex; gap:8px; align-items:center;"><span style="font-size:16px;">💊</span><span>CVS Pharmacy®</span></div>
-              <div style="display:flex; gap:8px; align-items:center;"><span style="font-size:16px;">📦</span><span>CVS Caremark®</span></div>
-              <div style="display:flex; gap:8px; align-items:center;"><span style="font-size:16px;">🔬</span><span>CVS Specialty®</span></div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-hd"><div class="card-hd-title">Managing relationships separately</div></div>
+          <div class="card-body" style="font-size:13px; color:var(--text-mid); line-height:1.6;">
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <div><strong style="color:var(--green);">Caregiving Relationship</strong> — identifies who you are legally responsible for. Can be removed without affecting any future re-authorization.</div>
+              <div><strong style="color:var(--blue);">PHR Authorization</strong> — grants access to pharmacy records. Can be revoked independently without ending the caregiving relationship.</div>
             </div>
+            <div class="divider"></div>
+            <p style="font-size:12px; color:var(--text-light);">Prescriptions across CVS Pharmacy®, CVS Caremark®, and CVS Specialty® are accessible only when PHR is authorized.</p>
           </div>
         </div>
       </div>
